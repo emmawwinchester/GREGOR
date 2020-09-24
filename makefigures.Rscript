@@ -1,0 +1,55 @@
+#this script generates plots for visualizing enrichment of SNPs in enhancers. 
+library(ggplot2)
+library(ggrepel)
+library(stringr)
+library(writexl)
+library(patchwork)
+path = "~/cotney/analysis/gwas/carieshuman"
+out.file<-""
+file.names<-dir(path, pattern=(glob2rx("*out.txt")))
+for (val in 1:length(file.names)){
+x<-read.table(file.names[val], sep='\t', header=FALSE)
+x[is.na(x)]<-1
+w<-cbind(x, (p.adjust(x$V4, "BH")), (p.adjust(x$V4, "bonferroni")), -log10(p.adjust(x$V4, "BH")), -log10(p.adjust(x$V4, "bonferroni")))
+x<-w
+colnames(x)<-c("Sample", "ObservedSNPs", 'ExpectedSNPs', 'PValue', 'Log2SNPFoldEnrichment', 'Lineage', 'BHCorrectedPValue', 'BonferroniCorrectedPValue', 'BHCorrectedPValueLog', 'BonferroniCorrectedPValueLog')
+write.table(x, str_remove(paste(file.names[val], '-table.txt', sep=''), "-out.txt"), sep='\t')
+write_xlsx(x, str_remove(paste(file.names[val], '-table.xlsx', sep=''), "-out.txt"))
+n<-head(x[order(-x$Log2SNPFoldEnrichment),], 15)
+q<-head(x[order(-x$BHCorrectedPValueLog),], 15)
+pdf(file=str_remove(paste(file.names[val], '.pdf', sep=''), "-out.txt"), height=8.5, width=11)
+print(ggplot(x, aes(x=Log2SNPFoldEnrichment, y=BHCorrectedPValueLog, colour=Lineage, shape=Lineage, label=Sample)) + geom_point(aes(size=ObservedSNPs))+ geom_hline(yintercept=1.3) + ggtitle(str_replace(str_remove(paste(file.names[val], ' SNPs in All States', sep=''), "-out.txt"),"_", " ")) + geom_label_repel(aes(label=Sample), data=subset(x, Log2SNPFoldEnrichment >= n$Log2SNPFoldEnrichment[10] | BHCorrectedPValueLog >= q$BHCorrectedPValueLog[10])) + scale_color_manual(values=c("red", "orange", "yellow", "aquamarine", "turquoise", "indianred", "khaki4", "seashell4", "grey", "black", "orangered", "orangered", "orangered", "green", "green4", "greenyellow", "greenyellow", "orange", "purple")) + labs(x="Fold Enrichment (Log2)", y="BH Corrected P Value (-Log10)", colour="Lineage", size="Number of SNPs in SuperEnhancers", shape="Lineage"))
+dev.off()
+}
+
+file.names<-dir(path, pattern=(glob2rx("*active*out.txt")))
+for (val in 1:length(file.names)){
+x<-read.table(file.names[val], sep='\t', header=FALSE)
+x[is.na(x)]<-1
+w<-cbind(x, (p.adjust(x$V4, "BH")), (p.adjust(x$V4, "bonferroni")), -log10(p.adjust(x$V4, "BH")), -log10(p.adjust(x$V4, "bonferroni")))
+x<-w
+colnames(x)<-c("Sample", "ObservedSNPs", 'ExpectedSNPs', 'PValue', 'Log2SNPFoldEnrichment', 'Lineage', 'BHCorrectedPValue', 'BonferroniCorrectedPValue', 'BHCorrectedPValueLog', 'BonferroniCorrectedPValueLog')
+write.table(x, str_remove(paste(file.names[val], '-table.txt', sep=''), "-out.txt"), sep='\t')
+write_xlsx(x, str_remove(paste(file.names[val], '-table.xlsx', sep=''), "-out.txt"))
+n<-head(x[order(-x$Log2SNPFoldEnrichment),], 15)
+q<-head(x[order(-x$BHCorrectedPValueLog),], 15)
+pdf(file=str_remove(paste(file.names[val], '.pdf', sep=''), "-out.txt"), height=8.5, width=11)
+print(ggplot(x, aes(x=Log2SNPFoldEnrichment, y=BHCorrectedPValueLog, colour=Lineage, shape=Lineage, label=Sample)) + geom_point(aes(size=ObservedSNPs))+ geom_hline(yintercept=1.3) + ggtitle(str_replace(str_remove(paste(file.names[val], ' SNPs in Active Enhancers and SuperEnhancers', sep=''), "-out.txt"),"_", " ")) + geom_label_repel(aes(label=Sample), data=subset(x, Log2SNPFoldEnrichment >= n$Log2SNPFoldEnrichment[10] | BHCorrectedPValueLog >= q$BHCorrectedPValueLog[10])) + scale_color_manual(values=c("orange", "green", "orange", "purple")) + labs(x="Fold Enrichment (Log2)", y="BH Corrected P Value (-Log10)", colour="Lineage", size="Number of SNPs in SuperEnhancers", shape="Lineage"))
+dev.off()
+}
+
+file.names<-dir(path, pattern=(glob2rx("*allenhancers*out.txt")))
+for (val in 1:length(file.names)){
+x<-read.table(file.names[val], sep='\t', header=FALSE)
+x[is.na(x)]<-1
+w<-cbind(x, (p.adjust(x$V4, "BH")), (p.adjust(x$V4, "bonferroni")), -log10(p.adjust(x$V4, "BH")), -log10(p.adjust(x$V4, "bonferroni")))
+x<-w
+colnames(x)<-c("Sample", "ObservedSNPs", 'ExpectedSNPs', 'PValue', 'Log2SNPFoldEnrichment', 'Lineage', 'BHCorrectedPValue', 'BonferroniCorrectedPValue', 'BHCorrectedPValueLog', 'BonferroniCorrectedPValueLog')
+write.table(x, str_remove(paste(file.names[val], '-table.txt', sep=''), "-out.txt"), sep='\t')
+write_xlsx(x, str_remove(paste(file.names[val], '-table.xlsx', sep=''), "-out.txt"))
+n<-head(x[order(-x$Log2SNPFoldEnrichment),], 15)
+q<-head(x[order(-x$BHCorrectedPValueLog),], 15)
+pdf(file=str_remove(paste(file.names[val], '.pdf', sep=''), "-out.txt"), height=8.5, width=11)
+print(ggplot(x, aes(x=Log2SNPFoldEnrichment, y=BHCorrectedPValueLog, colour=Lineage, shape=Lineage, label=Sample)) + geom_point(aes(size=ObservedSNPs))+ geom_hline(yintercept=1.3) + ggtitle(str_replace(str_remove(paste(file.names[val], ' SNPs in All Enhancers and SuperEnhancers', sep=''), "-out.txt"),"_", " ")) + geom_label_repel(aes(label=Sample), data=subset(x, Log2SNPFoldEnrichment >= n$Log2SNPFoldEnrichment[10] | BHCorrectedPValueLog >= q$BHCorrectedPValueLog[10])) + scale_color_manual(values=c("orange", "yellow", "darkkhaki", "green", "green", "orange", "purple")) + labs(x="Fold Enrichment (Log2)", y="BH Corrected P Value (-Log10)", colour="Lineage", size="Number of SNPs in SuperEnhancers", shape="Lineage"))
+dev.off()
+}
