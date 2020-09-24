@@ -12,6 +12,12 @@ do
 liftOver -minMatch=0.25 -bedPlus=9 $sample ~/cotney/genome/mm10/mm10ToHg19.over.chain.gz temp.bed temp.unmapped_0.10.bed
 sort -k1,1 -k2,2n temp.bed > hg19-25pct-$sample
 done
+cd /home/CAM/ewentworth/cotney/rawdata/chromatinsegmentations/superenhancers/mouse
+for sample in *.bed
+do
+liftOver -minMatch=0.25 -bedPlus=9 $sample ~/cotney/genome/mm10/mm10ToHg19.over.chain.gz temp.bed temp.unmapped_0.10.bed
+sort -k1,1 -k2,2n temp.bed > hg19-25pct-$sample
+done
 export DIR=/home/CAM/ewentworth/cotney/rawdata/chromatinsegmentations/mouse_18state
 export DIR2=/home/CAM/ewentworth/cotney/analysis/gwas/cariesmouse
 export DIR3=/home/CAM/ewentworth/cotney/rawdata/chromatinsegmentations/superenhancers/mouse
